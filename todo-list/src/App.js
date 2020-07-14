@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import './App.css';
-import ToDo from './TodoApp';
+// import ToDo from './TodoApp';
 
 class App extends Component {
   constructor(props) {
