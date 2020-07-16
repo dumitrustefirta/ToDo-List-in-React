@@ -129,9 +129,9 @@ body {
   width: 100%;
   word-break: break-all; }
 
-.complete {
-  border: 2px solid green; }
+/* .complete {
+  border: 2px solid green; } */
 
-.complete.todolist__item span {
+.complete {
   text-decoration: line-through;
   color: #ccc; }

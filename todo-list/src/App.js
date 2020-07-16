@@ -1,6 +1,8 @@
 import React, { Component } from 'react';
 import './App.css';
-// import ToDo from './TodoApp';
+import { ToDoList } from './ToDoComponents/TodoApp';
+import { Button } from './UIElements/button';
+import { StyleList } from './UIElements/ToDoListItem'
 
 class App extends Component {
   constructor(props) {
@@ -23,14 +25,28 @@ class App extends Component {
       id: new Date(),
       text: this.state.input,
       status: false
-    } 
+    }
     this.setState({
       input: '',
-      todos: this.state.todos.concat(newItem)
+      todos: this.state.todos.concat(newItem) 
     })
   }
 
-  removeItem(item) {
+  handleCheckStatus = (item) => {
+    console.log(item.status)
+
+    const newItems = this.state.todos.find(todos => {
+      return todos.status = !item.status;
+    });
+
+    this.setState({
+      todos: [newItems]
+    })
+    console.log(item.status)
+  }
+
+
+  handleRemoveItem = (item) => {
     const newTodos = this.state.todos.filter(todos => {
       return todos !== item;
     })
@@ -43,36 +59,29 @@ class App extends Component {
   render() {
     return (
       <div className="container">
-          <div className="list-header">
+        <div className="list-header">
           <h1>To Do list</h1>
-              <span id="date">{this.state.date.toLocaleDateString()}</span>        
+          <span id="date">{this.state.date.toLocaleDateString()}</span>
+        </div>
+        <div className="todo-component">
+          <div className="todo-component__control">
+            <div className="todo-component__input-group">
+              <input onChange={this.handleChangeInput} value={this.state.input} type="text" id="todo-input" placeholder=" Add to-do" />
+              {this.state.input.length ? (
+                <span id="input-count">Characters counter: {this.state.input.length}</span>
+              ) : null
+              }
+              <span id="total"></span>
+              <span id="total-done"></span>
+            </div>
+            <Button onClick={this.handleAddItem}>Add</Button>
           </div>
-          <div className="todo-component">
-              <div className="todo-component__control">
-                  <div className="todo-component__input-group">
-                      <input onChange={this.handleChangeInput} value={this.state.input}  type="text" id="todo-input" placeholder=" Add to-do" />
-                      {this.state.input.length ? (
-                        <span id="input-count">Characters counter: {this.state.input.length}</span>
-                        ) : null
-                      }
-                      <span id="total"></span>
-                      <span id="total-done"></span>
-                  </div>
-                  <button onClick={this.handleAddItem} id="todo-add">Add</button>
-              </div>
-              {/* <ToDo /> */}
-              <ul className="todolist" id="todolist">
-                {this.state.todos.length ? (
-                  this.state.todos.map((item) => {
-                    return (<li className='todolist__item'>
-                    <input type="checkbox" />
-                    <span className={item.status ? 'complete.todolist__item span' : ''}>{item.text}</span>
-                    <button onClick={(e) => this.removeItem(item)}>X</button> 
-                    </li>)
-                  })
-                ) : null}
-              </ul>
-          </div>
+          <ToDoList
+            todos={this.state.todos}
+            handleCheckStatus={this.handleCheckStatus}
+            handleRemoveItem={this.handleRemoveItem}
+          />
+        </div>
       </div>
     );
   }
