@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import './App.css';
 import { ToDoList } from './ToDoComponents/TodoApp';
 import { Button } from './UIElements/button';
-import { StyleList } from './UIElements/ToDoListItem'
+import { FiRefreshCw } from "react-icons/fi";
 
 class App extends Component {
   constructor(props) {
@@ -10,7 +10,7 @@ class App extends Component {
 
     this.state = {
       input: '',
-      todos: [],
+      todos: JSON.parse(localStorage.getItem('todos')) || [],
       date: new Date(),
     }
   }
@@ -21,6 +21,9 @@ class App extends Component {
   }
 
   handleAddItem = () => {
+    if (this.state.input.length === 0) {
+      return alert('No input!');
+    }
     const newItem = {
       id: new Date(),
       text: this.state.input,
@@ -28,23 +31,28 @@ class App extends Component {
     }
     this.setState({
       input: '',
-      todos: this.state.todos.concat(newItem) 
-    })
+      todos: this.state.todos.concat(newItem)
+    }, () => {
+      localStorage.setItem('todos', JSON.stringify(this.state.todos))
+    }
+    )
   }
 
   handleCheckStatus = (item) => {
-    console.log(item.status)
 
-    const newItems = this.state.todos.find(todos => {
-      return todos.status = !item.status;
+    const newItems = this.state.todos.map(todo => {
+      if (todo.id === item.id) {
+        todo.status = !item.status
+      }
+      return todo
     });
 
     this.setState({
-      todos: [newItems]
+      todos: newItems
+    }, () => {
+      localStorage.setItem('todos', JSON.stringify(this.state.todos))
     })
-    console.log(item.status)
   }
-
 
   handleRemoveItem = (item) => {
     const newTodos = this.state.todos.filter(todos => {
@@ -53,6 +61,34 @@ class App extends Component {
 
     this.setState({
       todos: [...newTodos]
+    }, () => {
+      localStorage.setItem('todos', JSON.stringify(this.state.todos))
+    })
+  }
+
+  handleClearAll = () => {
+    this.setState({
+      todos: []
+    }, () => {
+      localStorage.clear()
+    })
+  }
+
+  todoListStats = () => {
+    return this.state.todos.filter(item => item.status).length;
+  }
+
+  handleResetCheckBox = () => {
+    const resetItems = this.state.todos.map(item => {
+      if (item.status === true) {
+        item.status = false;
+      }
+      return item
+    })
+    this.setState({
+      todos: resetItems
+    }, () => {
+      localStorage.setItem('todos', JSON.stringify(this.state.todos))
     })
   }
 
@@ -61,18 +97,29 @@ class App extends Component {
       <div className="container">
         <div className="list-header">
           <h1>To Do list</h1>
+          <div className='clear'>
+            <FiRefreshCw className="clear-all" onClick={this.handleClearAll} />
+          </div>
           <span id="date">{this.state.date.toLocaleDateString()}</span>
         </div>
         <div className="todo-component">
           <div className="todo-component__control">
             <div className="todo-component__input-group">
               <input onChange={this.handleChangeInput} value={this.state.input} type="text" id="todo-input" placeholder=" Add to-do" />
-              {this.state.input.length ? (
+              {/* {this.state.input.length ? (
                 <span id="input-count">Characters counter: {this.state.input.length}</span>
               ) : null
               }
-              <span id="total"></span>
-              <span id="total-done"></span>
+              {this.state.todos.length ? (
+                <span id="total">Total items: {this.state.todos.length}</span>
+              ) : null
+              } */}
+              {this.todoListStats() || this.state.todos.length ? (
+                <span id="total-done">Done Todos: {this.todoListStats()} / {this.state.todos.length}
+                  <button className='uncheck-btn' onClick={this.handleResetCheckBox}>Undone</button>
+                </span>
+              ) : null
+              }
             </div>
             <Button onClick={this.handleAddItem}>Add</Button>
           </div>

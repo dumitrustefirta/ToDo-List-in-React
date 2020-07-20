@@ -11,6 +11,5 @@ export function ToDoList(props) {
                 })    
             }
         </ul>
-
     )
 }
